@@ -1,0 +1,195 @@
+{
+  "HSC_PHY1": {
+    "subject": "Physics",
+    "paper": "1st",
+    "subject_code": "174",
+    "chapters": [
+      {
+        "chapter_no": 1,
+        "chapter_id": "PHY1-CH01",
+        "name_bn": "ভৌতজগৎ ও পরিমাপ",
+        "name_en": "Physical World and Measurement",
+        "topics": [
+          {"topic_id": "PHY1-CH01-TOP01", "name_bn": "রাশির মাত্রা ও সমীকরণ", "name_en": "Dimensional Analysis"},
+          {"topic_id": "PHY1-CH01-TOP02", "name_bn": "পরিমাপের ত্রুটি ও ভার্নিয়ার স্কেল", "name_en": "Measurement Errors and Vernier Scale"}
+        ]
+      },
+      {
+        "chapter_no": 2,
+        "chapter_id": "PHY1-CH02",
+        "name_bn": "ভেক্টর",
+        "name_en": "Vectors",
+        "topics": [
+          {"topic_id": "PHY1-CH02-TOP01", "name_bn": "ভেক্টর যোজন ও সামান্তরিক সূত্র", "name_en": "Vector Addition & Parallelogram Law"},
+          {"topic_id": "PHY1-CH02-TOP02", "name_bn": "নদী-নৌকা ও আপেক্ষিক বেগ", "name_en": "River-Boat & Relative Velocity"},
+          {"topic_id": "PHY1-CH02-TOP03", "name_bn": "ডট গুণন ও লম্ব হওয়ার শর্ত", "name_en": "Dot Product & Orthogonality"},
+          {"topic_id": "PHY1-CH02-TOP04", "name_bn": "ক্রস গুণন ও ক্ষেত্রফল নির্ণয়", "name_en": "Cross Product & Area Calculation"},
+          {"topic_id": "PHY1-CH02-TOP05", "name_bn": "ভেক্টর ক্যালকুলাস (গ্র্যাডিয়েন্ট, ডাইভারজেন্স, কার্ল)", "name_en": "Vector Calculus (Grad, Div, Curl)"}
+        ]
+      },
+      {
+        "chapter_no": 4,
+        "chapter_id": "PHY1-CH04",
+        "name_bn": "নিউটনীয় বলবিদ্যা",
+        "name_en": "Newtonian Mechanics",
+        "topics": [
+          {"topic_id": "PHY1-CH04-TOP01", "name_bn": "বলের ঘাত ও ভরবেগের নিত্যতা", "name_en": "Impulse of Force & Momentum Conservation"},
+          {"topic_id": "PHY1-CH04-TOP02", "name_bn": "রাস্তার ব্যাংকিং ও কেন্দ্রমুখী বল", "name_en": "Road Banking & Centripetal Force"},
+          {"topic_id": "PHY1-CH04-TOP03", "name_bn": "জড়তার ভ্রামক ও কৌণিক ভরবেগ", "name_en": "Moment of Inertia & Angular Momentum"}
+        ]
+      },
+      {
+        "chapter_no": 5,
+        "chapter_id": "PHY1-CH05",
+        "name_bn": "কাজ, শক্তি ও ক্ষমতা",
+        "name_en": "Work, Energy and Power",
+        "topics": [
+          {"topic_id": "PHY1-CH05-TOP01", "name_bn": "পরিবর্তনশীল বল দ্বারা কাজ ও স্প্রিং", "name_en": "Work by Variable Force & Springs"},
+          {"topic_id": "PHY1-CH05-TOP02", "name_bn": "যান্ত্রিক শক্তির নিত্যতা সূত্র", "name_en": "Conservation of Mechanical Energy"},
+          {"topic_id": "PHY1-CH05-TOP03", "name_bn": "কুয়া ও পাম্পের কর্মদক্ষতা", "name_en": "Well, Pumps and Efficiency"}
+        ]
+      },
+      {
+        "chapter_no": 8,
+        "chapter_id": "PHY1-CH08",
+        "name_bn": "পর্যায়বৃত্ত গতি",
+        "name_en": "Periodic Motion",
+        "topics": [
+          {"topic_id": "PHY1-CH08-TOP01", "name_bn": "সরল ছন্দিত স্পন্দন ও সমীকরণ", "name_en": "Simple Harmonic Motion"},
+          {"topic_id": "PHY1-CH08-TOP02", "name_bn": "সরল দোলক ও পাহাড়ের উচ্চতা নির্ণয়", "name_en": "Simple Pendulum & Mountain Height"}
+        ]
+      },
+      {
+        "chapter_no": 10,
+        "chapter_id": "PHY1-CH10",
+        "name_bn": "আদর্শ গ্যাস ও গ্যাসের গতিতত্ত্ব",
+        "name_en": "Ideal Gas and Kinetic Theory of Gases",
+        "topics": [
+          {"topic_id": "PHY1-CH10-TOP01", "name_bn": "বয়েল ও চার্লসের সূত্র, হ্রদের গভীরতা", "name_en": "Boyle & Charles Law, Lake Depth"},
+          {"topic_id": "PHY1-CH10-TOP02", "name_bn": "গ্যাসের আরএমএস বেগ ও গতিশক্তি", "name_en": "RMS Velocity & Kinetic Energy"},
+          {"topic_id": "PHY1-CH10-TOP03", "name_bn": "আপেক্ষিক আর্দ্রতা ও শিশিরাঙ্ক", "name_en": "Relative Humidity & Dew Point"}
+        ]
+      }
+    ]
+  },
+  "HSC_ICT": {
+    "subject": "ICT",
+    "paper": null,
+    "subject_code": "275",
+    "chapters": [
+      {
+        "chapter_no": 1,
+        "chapter_id": "ICT-CH01",
+        "name_bn": "তথ্য ও যোগাযোগ প্রযুক্তি: বিশ্ব ও বাংলাদেশ প্রেক্ষিত",
+        "name_en": "ICT: Global and Bangladesh Perspective",
+        "topics": [
+          {"topic_id": "ICT-CH01-TOP01", "name_bn": "কৃত্রিম বুদ্ধিমত্তা ও রোবোটিক্স", "name_en": "AI and Robotics"},
+          {"topic_id": "ICT-CH01-TOP02", "name_bn": "বায়োমেট্রিক্স ও বায়োইনফরমেটিক্স", "name_en": "Biometrics & Bioinformatics"},
+          {"topic_id": "ICT-CH01-TOP03", "name_bn": "ক্রায়োসার্জারি ও ভার্চুয়াল রিয়েলিটি", "name_en": "Cryosurgery & Virtual Reality"}
+        ]
+      },
+      {
+        "chapter_no": 2,
+        "chapter_id": "ICT-CH02",
+        "name_bn": "কমিউনিকেশন সিস্টেমস ও নেটওয়ার্কিং",
+        "name_en": "Communication Systems and Networking",
+        "topics": [
+          {"topic_id": "ICT-CH02-TOP01", "name_bn": "ডাটা ট্রান্সমিশন মেথড ও মোড", "name_en": "Data Transmission Methods & Modes"},
+          {"topic_id": "ICT-CH02-TOP02", "name_bn": "ওয়্যারলেস কমিউনিকেশন (Bluetooth, Wi-Fi, WiMAX)", "name_en": "Wireless Communication"},
+          {"topic_id": "ICT-CH02-TOP03", "name_bn": "নেটওয়ার্ক টপোলজি", "name_en": "Network Topologies"}
+        ]
+      },
+      {
+        "chapter_no": 3,
+        "chapter_id": "ICT-CH03",
+        "name_bn": "সংখ্যা পদ্ধতি ও ডিজিটাল ডিভাইস",
+        "name_en": "Number Systems and Digital Devices",
+        "topics": [
+          {"topic_id": "ICT-CH03-TOP01", "name_bn": "সংখ্যা রূপান্তর ও ২ এর পরিপূরক", "name_en": "Number Conversion & 2's Complement"},
+          {"topic_id": "ICT-CH03-TOP02", "name_bn": "লজিক গেট ও সার্বজনীন গেট", "name_en": "Logic Gates & Universal Gates"},
+          {"topic_id": "ICT-CH03-TOP03", "name_bn": "অ্যাডার, এনকোডার ও ডিকোডার", "name_en": "Adders, Encoders & Decoders"}
+        ]
+      },
+      {
+        "chapter_no": 4,
+        "chapter_id": "ICT-CH04",
+        "name_bn": "ওয়েব ডিজাইন পরিচিতি এবং HTML",
+        "name_en": "Web Design & HTML",
+        "topics": [
+          {"topic_id": "ICT-CH04-TOP01", "name_bn": "ওয়েবসাইট কাঠামো ও প্রকারভেদ", "name_en": "Website Structures & Types"},
+          {"topic_id": "ICT-CH04-TOP02", "name_bn": "HTML টেবিল ও ইমেজ ট্যাগ", "name_en": "HTML Tables & Images"},
+          {"topic_id": "ICT-CH04-TOP03", "name_bn": "হাইপারলিঙ্ক ও ফর্ম", "name_en": "Hyperlinks and Forms"}
+        ]
+      },
+      {
+        "chapter_no": 5,
+        "chapter_id": "ICT-CH05",
+        "name_bn": "প্রোগ্রামিং ভাষা",
+        "name_en": "Programming Language",
+        "topics": [
+          {"topic_id": "ICT-CH05-TOP01", "name_bn": "অ্যালগরিদম ও ফ্লোচার্ট", "name_en": "Algorithm & Flowchart"},
+          {"topic_id": "ICT-CH05-TOP02", "name_bn": "সি প্রোগ্রামিং কন্ডিশনাল ও লুপ", "name_en": "C Programming: Conditionals & Loops"},
+          {"topic_id": "ICT-CH05-TOP03", "name_bn": "অ্যারে ও ফাংশন", "name_en": "Arrays & Functions"}
+        ]
+      }
+    ]
+  },
+  "SSC_MATH": {
+    "subject": "General Mathematics",
+    "paper": null,
+    "subject_code": "109",
+    "chapters": [
+      {
+        "chapter_no": 2,
+        "chapter_id": "MATH-CH02",
+        "name_bn": "সেট ও ফাংশন",
+        "name_en": "Sets and Functions",
+        "topics": [
+          {"topic_id": "MATH-CH02-TOP01", "name_bn": "সেট প্রক্রিয়াকরণ ও শক্তি সেট", "name_en": "Set Operations & Power Sets"},
+          {"topic_id": "MATH-CH02-TOP02", "name_bn": "ফাংশন, ডোমেন ও রেঞ্জ", "name_en": "Functions, Domain & Range"}
+        ]
+      },
+      {
+        "chapter_no": 3,
+        "chapter_id": "MATH-CH03",
+        "name_bn": "বীজগাণিতিক রাশি",
+        "name_en": "Algebraic Expressions",
+        "topics": [
+          {"topic_id": "MATH-CH03-TOP01", "name_bn": "বর্গ ও ঘন সংবলিত সূত্রাবলি", "name_en": "Square and Cube Identities"},
+          {"topic_id": "MATH-CH03-TOP02", "name_bn": "উৎপাদকে বিশ্লেষণ ও মান নির্ণয়", "name_en": "Factorization and Evaluation"}
+        ]
+      },
+      {
+        "chapter_no": 8,
+        "chapter_id": "MATH-CH08",
+        "name_bn": "বৃত্ত",
+        "name_en": "Circle (Geometry)",
+        "topics": [
+          {"topic_id": "MATH-CH08-TOP01", "name_bn": "বৃত্তের জ্যা ও কেন্দ্রস্থ কোণ", "name_en": "Chords and Central Angles"},
+          {"topic_id": "MATH-CH08-TOP02", "name_bn": "বৃত্ত সম্পর্কিত উপপাদ্য ও স্পর্শক", "name_en": "Circle Theorems and Tangents"}
+        ]
+      },
+      {
+        "chapter_no": 9,
+        "chapter_id": "MATH-CH09",
+        "name_bn": "ত্রিকোণমিতিক অনুপাত",
+        "name_en": "Trigonometric Ratios",
+        "topics": [
+          {"topic_id": "MATH-CH09-TOP01", "name_bn": "সূক্ষ্মকোণের ত্রিকোণমিতিক অনুপাত", "name_en": "Trigonometric Ratios of Acute Angles"},
+          {"topic_id": "MATH-CH09-TOP02", "name_bn": "দূরত্ব ও উচ্চতা বিষয়ক সমস্যা", "name_en": "Distance and Elevation Problems"}
+        ]
+      },
+      {
+        "chapter_no": 17,
+        "chapter_id": "MATH-CH17",
+        "name_bn": "পরিসংখ্যান",
+        "name_en": "Statistics",
+        "topics": [
+          {"topic_id": "MATH-CH17-TOP01", "name_bn": "সংক্ষিপ্ত পদ্ধতিতে গড় নির্ণয়", "name_en": "Mean Calculation by Shortcut Method"},
+          {"topic_id": "MATH-CH17-TOP02", "name_bn": "মধ্যক ও প্রচুরক নির্ণয়", "name_en": "Median and Mode Calculation"},
+          {"topic_id": "MATH-CH17-TOP03", "name_bn": "অজিভ রেখা ও বহুভুজ অঙ্কন", "name_en": "Ogive Curve and Histogram"}
+        ]
+      }
+    ]
+  }
+}

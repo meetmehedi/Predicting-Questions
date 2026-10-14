@@ -1,0 +1,58 @@
+[
+  {
+    "year_range": [2010, 2011],
+    "phase": "early_cq_ssc",
+    "name": "Introduction of Creative Questions (SSC)",
+    "description": "Creative Question (CQ) system first launched in SSC for Bangla 1st Paper (2010), then expanded.",
+    "is_cq": true,
+    "structural_impact": "Discontinuity in question format. Before 2010, exams were 100% traditional essay/short questions."
+  },
+  {
+    "year_range": [2012, 2015],
+    "phase": "early_cq_hsc",
+    "name": "CQ Expansion to HSC",
+    "description": "Gradual rollout of Creative Questions to HSC across Bangla, ICT, and science subjects.",
+    "is_cq": true,
+    "structural_impact": "Marks distribution: Non-practical 60 CQ (6 out of 9) + 40 MCQ; Practical 50 CQ (5 out of 8) + 35 MCQ + 15 Practical."
+  },
+  {
+    "year_range": [2016, 2019],
+    "phase": "full_syllabus",
+    "name": "Standardized Modern CQ System",
+    "description": "Strict standardization: Non-practical 70 CQ (7 out of 11) + 30 MCQ; Practical 50 CQ (5 out of 8) + 25 MCQ + 25 Practical.",
+    "is_cq": true,
+    "structural_impact": "Stable period. 2018 HSC was conducted with a single uniform Combined Board Question for all boards."
+  },
+  {
+    "year_range": [2020, 2020],
+    "phase": "covid_autopass",
+    "name": "COVID-19 Cancellation (Auto-Pass)",
+    "description": "HSC 2020 was cancelled due to the pandemic; results calculated based on JSC & SSC GPA averages (JSC 25%, SSC 75%).",
+    "is_cq": false,
+    "structural_impact": "Total data gap for HSC 2020. No question papers exist."
+  },
+  {
+    "year_range": [2021, 2021],
+    "phase": "covid_short_2021",
+    "name": "COVID Short Syllabus (Group Subjects Only)",
+    "description": "Exams held only on 3 elective group subjects with heavily reduced syllabus, shortened duration (1.5 hours), and greater choice (answer 2-3 out of 8).",
+    "is_cq": true,
+    "structural_impact": "Severe selection bias and shortened format; chapter inclusion was restricted to ~4-5 designated chapters."
+  },
+  {
+    "year_range": [2022, 2023],
+    "phase": "covid_short_2022_2023",
+    "name": "Revised Condensed Syllabus",
+    "description": "Re-introduced compulsory subjects, retained condensed chapter subsets (roughly 50-70% syllabus coverage).",
+    "is_cq": true,
+    "structural_impact": "Chapters outside the short syllabus had 0% probability of appearance by policy mandate."
+  },
+  {
+    "year_range": [2024, 2026],
+    "phase": "transition_2024_plus",
+    "name": "Curriculum Transformation & Full Syllabus Return",
+    "description": "HSC returning to full/standard syllabus; ongoing educational reform (National Curriculum Framework 2021/2024).",
+    "is_cq": true,
+    "structural_impact": "Gradual shifting of evaluation methods, requiring dynamic covariate modeling."
+  }
+]

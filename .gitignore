@@ -1,0 +1,38 @@
+# Environments & Virtual Envs
+.venv/
+venv/
+ENV/
+env/
+*.env
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
+# LaTeX Auxiliary Files
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+# Temporary image previews
+docs/page_prev*.png
+docs/arch_preview*.png
+page_prev*.png
+arch_preview*.png
+
+# Raw bulk PDF exam papers (>1.4GB, reproducible via scripts/question_downloader.py)
+data/raw/pdfs/**/*.pdf
+data/raw/pdfs/*.pdf

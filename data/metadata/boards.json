@@ -1,0 +1,110 @@
+[
+  {
+    "board_id": "DHA",
+    "name_en": "Dhaka",
+    "name_bn": "ঢাকা",
+    "type": "General",
+    "established_year": 1921,
+    "headquarters": "Bakshibazar, Dhaka",
+    "official_url": "https://dhakaeducationboard.gov.bd"
+  },
+  {
+    "board_id": "CTG",
+    "name_en": "Chattogram",
+    "name_bn": "চট্টগ্রাম",
+    "type": "General",
+    "established_year": 1995,
+    "headquarters": "Muradpur, Chattogram",
+    "official_url": "https://bise-ctg.gov.bd"
+  },
+  {
+    "board_id": "RAJ",
+    "name_en": "Rajshahi",
+    "name_bn": "রাজশাহী",
+    "type": "General",
+    "established_year": 1961,
+    "headquarters": "Laxmipur, Rajshahi",
+    "official_url": "https://rajshahieducationboard.gov.bd"
+  },
+  {
+    "board_id": "COM",
+    "name_en": "Cumilla",
+    "name_bn": "কুমিল্লা",
+    "type": "General",
+    "established_year": 1962,
+    "headquarters": "Kandirpar, Cumilla",
+    "official_url": "https://comillaboard.portal.gov.bd"
+  },
+  {
+    "board_id": "JAS",
+    "name_en": "Jashore",
+    "name_bn": "যশোর",
+    "type": "General",
+    "established_year": 1963,
+    "headquarters": "Jashore",
+    "official_url": "https://jessoreboard.gov.bd"
+  },
+  {
+    "board_id": "BAR",
+    "name_en": "Barishal",
+    "name_bn": "বরিশাল",
+    "type": "General",
+    "established_year": 1999,
+    "headquarters": "Barishal",
+    "official_url": "https://barisalboard.gov.bd"
+  },
+  {
+    "board_id": "SYL",
+    "name_en": "Sylhet",
+    "name_bn": "সিলেট",
+    "type": "General",
+    "established_year": 1999,
+    "headquarters": "Alamput, Sylhet",
+    "official_url": "https://sylhetboard.gov.bd"
+  },
+  {
+    "board_id": "DIN",
+    "name_en": "Dinajpur",
+    "name_bn": "দিনাজপুর",
+    "type": "General",
+    "established_year": 2006,
+    "headquarters": "Dinajpur",
+    "official_url": "https://dinajpurold.dinajpurbd.org"
+  },
+  {
+    "board_id": "MYM",
+    "name_en": "Mymensingh",
+    "name_bn": "ময়মনসিংহ",
+    "type": "General",
+    "established_year": 2017,
+    "headquarters": "Mymensingh",
+    "official_url": "https://mymensingheducationboard.gov.bd"
+  },
+  {
+    "board_id": "MAD",
+    "name_en": "Madrasah",
+    "name_bn": "মাদ্রাসা",
+    "type": "Madrasah",
+    "established_year": 1979,
+    "headquarters": "Dhaka",
+    "official_url": "https://bmeb.gov.bd"
+  },
+  {
+    "board_id": "TEC",
+    "name_en": "Technical",
+    "name_bn": "কারিগরি",
+    "type": "Technical",
+    "established_year": 1967,
+    "headquarters": "Agargaon, Dhaka",
+    "official_url": "https://bteb.gov.bd"
+  },
+  {
+    "board_id": "ALL",
+    "name_en": "Combined",
+    "name_bn": "অভিন্ন বোর্ড (সকল বোর্ড)",
+    "type": "Combined",
+    "established_year": 2018,
+    "headquarters": "National",
+    "official_url": "https://educationboard.gov.bd"
+  }
+]

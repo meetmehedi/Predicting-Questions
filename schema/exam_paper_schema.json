@@ -1,0 +1,656 @@
+{
+  "$defs": {
+    "BoardName": {
+      "enum": [
+        "Dhaka",
+        "Chattogram",
+        "Rajshahi",
+        "Cumilla",
+        "Jashore",
+        "Barishal",
+        "Sylhet",
+        "Dinajpur",
+        "Mymensingh",
+        "Madrasah",
+        "Technical",
+        "Combined"
+      ],
+      "title": "BoardName",
+      "type": "string"
+    },
+    "CognitiveDomain": {
+      "enum": [
+        "knowledge",
+        "comprehension",
+        "application",
+        "higher_order",
+        "mixed"
+      ],
+      "title": "CognitiveDomain",
+      "type": "string"
+    },
+    "CurriculumPhase": {
+      "enum": [
+        "pre_cq",
+        "early_cq",
+        "full_syllabus",
+        "covid_autopass",
+        "covid_short_2021",
+        "covid_short_2022_2023",
+        "transition_2024_plus"
+      ],
+      "title": "CurriculumPhase",
+      "type": "string"
+    },
+    "ExamLevel": {
+      "enum": [
+        "SSC",
+        "HSC",
+        "Dakhil",
+        "Alim"
+      ],
+      "title": "ExamLevel",
+      "type": "string"
+    },
+    "MCQOption": {
+      "description": "Represents an option in an MCQ question.",
+      "properties": {
+        "label": {
+          "description": "'ক', 'খ', 'গ', 'ঘ' or 'A', 'B', 'C', 'D'",
+          "title": "Label",
+          "type": "string"
+        },
+        "text_bn": {
+          "description": "Bangla option text",
+          "title": "Text Bn",
+          "type": "string"
+        },
+        "text_en": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "English option text",
+          "title": "Text En"
+        },
+        "is_correct": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Ground truth answer indicator",
+          "title": "Is Correct"
+        }
+      },
+      "required": [
+        "label",
+        "text_bn"
+      ],
+      "title": "MCQOption",
+      "type": "object"
+    },
+    "MCQVariant": {
+      "enum": [
+        "single",
+        "multiple_completion",
+        "stem_context"
+      ],
+      "title": "MCQVariant",
+      "type": "string"
+    },
+    "QuestionRecord": {
+      "description": "Canonical record representing a single examination question (CQ, MCQ, or Traditional).",
+      "properties": {
+        "id": {
+          "description": "Globally unique question identifier (e.g. HSC-2023-DHA-PHY1-CQ-01)",
+          "title": "Id",
+          "type": "string"
+        },
+        "exam": {
+          "$ref": "#/$defs/ExamLevel",
+          "description": "Examination level: SSC, HSC, Dakhil, Alim"
+        },
+        "year": {
+          "description": "Examination year",
+          "maximum": 2030,
+          "minimum": 2000,
+          "title": "Year",
+          "type": "integer"
+        },
+        "board": {
+          "$ref": "#/$defs/BoardName",
+          "description": "Education board name"
+        },
+        "subject": {
+          "description": "Subject name in English (e.g. Physics, Bangla, ICT)",
+          "title": "Subject",
+          "type": "string"
+        },
+        "subject_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Official NCTB subject code (e.g. '174')",
+          "title": "Subject Code"
+        },
+        "paper": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "'1st', '2nd', or null for single paper subjects",
+          "title": "Paper"
+        },
+        "set": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Question set (e.g. 'Ka', 'Kha', '1', '2')",
+          "title": "Set"
+        },
+        "q_type": {
+          "$ref": "#/$defs/QuestionType",
+          "description": "Question format: CQ, MCQ, Short, Traditional"
+        },
+        "question_no": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Sequential question number in the paper (1 to 30)",
+          "title": "Question No"
+        },
+        "marks": {
+          "description": "Total allocated marks (10 for standard CQ, 1 for MCQ)",
+          "exclusiveMinimum": 0,
+          "title": "Marks",
+          "type": "number"
+        },
+        "text_bn": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Unified text representation in Bangla",
+          "title": "Text Bn"
+        },
+        "text_en": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Unified text representation in English",
+          "title": "Text En"
+        },
+        "stem": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Stimulus / উদ্দীপক text, context story, code snippet, or table",
+          "title": "Stem"
+        },
+        "has_image": {
+          "default": false,
+          "description": "True if question contains a diagram, circuit, figure, or graph",
+          "title": "Has Image",
+          "type": "boolean"
+        },
+        "image_paths": {
+          "description": "Relative paths to attached figures",
+          "items": {
+            "type": "string"
+          },
+          "title": "Image Paths",
+          "type": "array"
+        },
+        "sub_parts": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/SubQuestion"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Structured 4 sub-parts (ক, খ, গ, ঘ) for Creative Questions",
+          "title": "Sub Parts"
+        },
+        "options": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/MCQOption"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Options for Multiple Choice Questions",
+          "title": "Options"
+        },
+        "mcq_variant": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MCQVariant"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specific MCQ variant (single, multiple-completion, context-based)"
+        },
+        "answer_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Correct MCQ option label (e.g. 'গ')",
+          "title": "Answer Key"
+        },
+        "chapter_id": {
+          "description": "NCTB Chapter ID (e.g. 'PHY1-CH02')",
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "chapter_name_bn": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Chapter name in Bengali",
+          "title": "Chapter Name Bn"
+        },
+        "chapter_name_en": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Chapter name in English",
+          "title": "Chapter Name En"
+        },
+        "topic_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Primary topic ID (e.g. 'PHY1-CH02-TOP04')",
+          "title": "Topic Id"
+        },
+        "topic_tags": {
+          "description": "Descriptive concept keywords",
+          "items": {
+            "type": "string"
+          },
+          "title": "Topic Tags",
+          "type": "array"
+        },
+        "bloom_level": {
+          "$ref": "#/$defs/CognitiveDomain",
+          "description": "Primary cognitive level or 'mixed' for CQ"
+        },
+        "curriculum_phase": {
+          "$ref": "#/$defs/CurriculumPhase",
+          "default": "full_syllabus",
+          "description": "Curriculum regime for covariate analysis"
+        },
+        "source_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "URL of board archive, portal, or source document",
+          "title": "Source Url"
+        },
+        "ocr_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Estimated OCR confidence score (1.0 for verified text)",
+          "title": "Ocr Confidence"
+        },
+        "verification_status": {
+          "$ref": "#/$defs/VerificationStatus",
+          "default": "semi_verified",
+          "description": "Data verification tier"
+        },
+        "annotator_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Identifier of annotator or pipeline version",
+          "title": "Annotator Id"
+        }
+      },
+      "required": [
+        "id",
+        "exam",
+        "year",
+        "board",
+        "subject",
+        "q_type",
+        "marks",
+        "chapter_id",
+        "bloom_level"
+      ],
+      "title": "QuestionRecord",
+      "type": "object"
+    },
+    "QuestionType": {
+      "enum": [
+        "CQ",
+        "MCQ",
+        "Short",
+        "Traditional"
+      ],
+      "title": "QuestionType",
+      "type": "string"
+    },
+    "SubQuestion": {
+      "description": "Represents an individual sub-part of a Creative Question (CQ): ক, খ, গ, or ঘ.",
+      "properties": {
+        "part": {
+          "description": "Sub-part label: 'ক', 'খ', 'গ', 'ঘ' or 'a', 'b', 'c', 'd'",
+          "title": "Part",
+          "type": "string"
+        },
+        "cognitive_domain": {
+          "$ref": "#/$defs/CognitiveDomain",
+          "description": "Bloom's taxonomy cognitive domain"
+        },
+        "marks": {
+          "description": "Standard marks: ক=1, খ=2, গ=3, ঘ=4",
+          "maximum": 4,
+          "minimum": 1,
+          "title": "Marks",
+          "type": "integer"
+        },
+        "text_bn": {
+          "description": "Bangla text of the sub-question",
+          "title": "Text Bn",
+          "type": "string"
+        },
+        "text_en": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "English translation or English version text",
+          "title": "Text En"
+        },
+        "chapter_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specific chapter ID if different from main question",
+          "title": "Chapter Id"
+        },
+        "topic_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specific topic ID mapped to NCTB curriculum",
+          "title": "Topic Id"
+        },
+        "sample_answer_bn": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Official mark scheme or model answer",
+          "title": "Sample Answer Bn"
+        }
+      },
+      "required": [
+        "part",
+        "cognitive_domain",
+        "marks",
+        "text_bn"
+      ],
+      "title": "SubQuestion",
+      "type": "object"
+    },
+    "VerificationStatus": {
+      "enum": [
+        "raw_ocr",
+        "semi_verified",
+        "gold_verified"
+      ],
+      "title": "VerificationStatus",
+      "type": "string"
+    }
+  },
+  "description": "Represents a complete examination paper containing multiple questions.",
+  "properties": {
+    "paper_id": {
+      "description": "Unique exam paper ID (e.g. HSC-2023-DHA-PHY1)",
+      "title": "Paper Id",
+      "type": "string"
+    },
+    "exam": {
+      "$ref": "#/$defs/ExamLevel"
+    },
+    "year": {
+      "title": "Year",
+      "type": "integer"
+    },
+    "board": {
+      "$ref": "#/$defs/BoardName"
+    },
+    "subject": {
+      "title": "Subject",
+      "type": "string"
+    },
+    "paper": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Paper"
+    },
+    "subject_code": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Subject Code"
+    },
+    "time_minutes": {
+      "default": 150,
+      "description": "Total exam duration in minutes",
+      "title": "Time Minutes",
+      "type": "integer"
+    },
+    "total_marks": {
+      "description": "Total paper marks (e.g. 50, 75, 100)",
+      "title": "Total Marks",
+      "type": "number"
+    },
+    "curriculum_phase": {
+      "$ref": "#/$defs/CurriculumPhase"
+    },
+    "cq_total_questions": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Number of CQs given (e.g. 8)",
+      "title": "Cq Total Questions"
+    },
+    "cq_answer_count": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Number of CQs required to answer (e.g. 5)",
+      "title": "Cq Answer Count"
+    },
+    "mcq_total_questions": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Number of MCQs (e.g. 25)",
+      "title": "Mcq Total Questions"
+    },
+    "questions": {
+      "items": {
+        "$ref": "#/$defs/QuestionRecord"
+      },
+      "title": "Questions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "paper_id",
+    "exam",
+    "year",
+    "board",
+    "subject",
+    "total_marks",
+    "curriculum_phase"
+  ],
+  "title": "ExamPaper",
+  "type": "object"
+}
