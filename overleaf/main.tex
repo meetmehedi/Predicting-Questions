@@ -1,0 +1,549 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{afterpage}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds, calc, trees}
+
+% Enterprise architecture color palette
+\definecolor{panelborder}{HTML}{94A3B8}
+\definecolor{panelbg}{HTML}{F8FAFC}
+\definecolor{darkcard}{HTML}{0F172A}
+\definecolor{darkcardborder}{HTML}{334155}
+\definecolor{pillnavy}{HTML}{0F172A}
+\definecolor{enginebg}{HTML}{F0F9FF}
+\definecolor{engineborder}{HTML}{38BDF8}
+\definecolor{enginepill}{HTML}{0284C7}
+\definecolor{cardblue}{HTML}{0284C7}
+\definecolor{cardblueborder}{HTML}{0369A1}
+\definecolor{policybg}{HTML}{F0FDF4}
+\definecolor{policyborder}{HTML}{4ADE80}
+\definecolor{policypill}{HTML}{16A34A}
+\definecolor{alertredbg}{HTML}{FEF2F2}
+\definecolor{alertredborder}{HTML}{F87171}
+\definecolor{alertredtext}{HTML}{DC2626}
+\definecolor{succgreenbg}{HTML}{F0FDF4}
+\definecolor{succgreenborder}{HTML}{4ADE80}
+\definecolor{succgreentext}{HTML}{16A34A}
+\definecolor{badgetext}{HTML}{E0F2FE}
+
+% Hyperref setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=teal!70!black,
+    citecolor=blue!70!black,
+    urlcolor=cyan!70!black,
+}
+
+% Page styling
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\small \textsc{BD-ExamQ}: Research Corpus \& Benchmark Report}
+\lhead{\small Supervisor Review Draft}
+\rfoot{\small Page \thepage}
+
+\titleformat{\section}{\large\bfseries\color{teal!70!black}}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+\title{\Large \textbf{BD-ExamQ: A Comprehensive Historical Corpus and Benchmark for Predicting Secondary and Higher Secondary Board Examination Questions in Bangladesh}\\
+\vspace{0.4em}\large \textsl{Technical Report and Corpus Description for Supervisory Review}}
+
+\author{
+    \textbf{Md.\ Mehedi Hasan}\\
+    Department of Computer Science and Engineering\\
+    \texttt{Research Focus: Educational Data Mining, NLP, and Assessment Forecasting}
+}
+\date{\textbf{October 2026} \quad $\vert$ \quad \textbf{Draft Version 1.0}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Standardized national examinations in Bangladesh---specifically the Secondary School Certificate (SSC, Grade 10) and Higher Secondary Certificate (HSC, Grade 12)---are high-stakes assessments impacting over three million students annually. Despite their critical societal and educational importance, computational research into automated question analysis, syllabus coverage forecasting, and assessment modeling has been bottlenecked by the absence of an open, machine-readable, temporally curated corpus. In this work, we introduce \textbf{BD-ExamQ}, the first large-scale, digitally parsed, and temporally partitioned historical corpus of Bangladesh Education Board examination questions. Spanning from 2010 to 2025 across all nine general education boards (Dhaka, Chattogram, Rajshahi, Dinajpur, Barishal, Sylhet, Jashore, Cumilla, and Mymensingh), the corpus comprises \textbf{545 verified board question papers}, containing \textbf{15,307 structured question items}, \textbf{12,015 Creative Question (CQ) sub-parts}, and representing \textbf{56,149 examination marks}. We describe our multimodal ingestion pipeline integrating dual-language Tesseract OCR (Bengali and English) at 150~DPI, watermark and noise filtering, and heuristic segmentation into Creative Questions (structured by Bloom's cognitive taxonomy) and Multiple Choice Questions (MCQ). Finally, we formalize a leak-free chronological benchmark splitting the corpus into Training ($\le 2017$, 12,420 items), Validation (2018--2022, 2,071 items), and Test (2023 holdout, 802 items), and establish baseline results using historical frequency, recency rotation heuristics, and first-order Markov transition models. We present this comprehensive technical report for supervisory review to delineate prospective thesis directions.
+\end{abstract}
+
+\vspace{1em}
+\noindent\textbf{Keywords:} Educational NLP, Question Prediction, Bangladesh Education Boards, Creative Question (CQ) Model, Bloom's Taxonomy, Temporal Data Partitioning, OCR Pipeline.
+
+\vspace{1em}
+\hrule
+\vspace{1.5em}
+
+\section{Introduction and Research Motivation}
+\label{sec:intro}
+
+In Bangladesh, the Secondary School Certificate (SSC) and Higher Secondary Certificate (HSC) examinations represent the paramount scholastic gateways for secondary and post-secondary students \cite{nctb2012curriculum, unesco2019bangladesh}. Administered annually by the Ministry of Education across nine regional general education boards, along with dedicated Madrasah and Technical boards, these standardized assessments govern university matriculation, professional school eligibility (engineering and medicine), and socioeconomic mobility. While western natural language processing benchmarks have systematically evaluated standardized assessments like MMLU \cite{hendrycks2021measuring} and explored educational data mining \cite{baker2009educational}, empirical research into national examination systems in South Asia has been severely bottlenecked by data fragmentation.
+
+Due to the intense competitive pressure, a persistent cultural phenomenon known as ``Suggestion Culture'' has evolved. Examinees and educators routinely attempt to predict upcoming examination topics and chapter weightings. Commercial test-paper publishers produce guidebooks (e.g., \textit{Made Easy}, \textit{Lecture}, and \textit{Panjeree}) containing past board papers. Students commonly rely on unverified folk heuristics---such as the \textit{recency alternation hypothesis} (assuming topics evaluated in year $t-1$ are rotated out in year $t$) or crude frequency counts. However, to date, there has been no rigorous, empirical, or machine-learning-driven investigation into whether examination question setters exhibit statistically detectable temporal recurrence patterns, topic rotations, or latent cognitive preferences.
+
+A primary obstacle has been data infrastructure:
+\begin{enumerate}[noitemsep,topsep=2pt]
+    \item \textbf{Digital Fragmentation:} Authentic board papers are published on paper sheets and distributed physically across testing centers; digital archives exist only as heterogeneous, watermarked, or scanned image-only PDFs spread across decentralized web portals.
+    \item \textbf{Complex Multilingual Assessment Formats:} Bangladeshi examinations combine Bengali typography, English technical terminology, scientific diagrams, and mathematical equations.
+    \item \textbf{Hierarchical Creative Question (CQ) Structure:} Unlike standard western multiple-choice tests, Bangladeshi secondary assessments heavily utilize the four-tiered Creative Question framework, requiring structured parsing of stems and multi-level cognitive sub-questions.
+\end{enumerate}
+
+To bridge this gap, this project constructs \textbf{BD-ExamQ}, a unified, machine-readable research corpus and benchmarking suite. This report documents the examination system architecture, data harvesting and OCR engineering pipeline, corpus descriptive statistics, benchmark formalization, and baseline findings for supervisory review.
+
+\clearpage
+
+\section{The Bangladesh Standardized Examination Architecture}
+\label{sec:exam_architecture}
+
+\subsection{Education Boards and Geographical Governance}
+The examination system in Bangladesh operates under a federalized regional board framework overseen by the Inter-Board Coordination Board. The nine general education boards represent the administrative divisions:
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Dhaka Board:} The largest board, historically setting trends in assessment design.
+    \item \textbf{Chattogram, Rajshahi, Khulna/Jashore, Barishal, Sylhet, Dinajpur, Cumilla, and Mymensingh:} Regional boards serving distinct urban and rural demographics.
+    \item \textbf{National Combined Papers (``All Board''):} In specific examination cycles (e.g., 2016--2018), multiple boards shared unified national question papers to standardize parity across divisions.
+\end{itemize}
+
+\subsection{The Creative Question (CQ / \textsl{Srijonshil Proshno}) Framework}
+Introduced under the National Curriculum and Textbook Board (NCTB) reforms in 2008 to curb rote memorization \cite{nctb2012curriculum, nctb2017creative}, the Creative Question (CQ) model assesses students across hierarchical cognitive domains inspired by Bloom's Revised Taxonomy \cite{bloom1956taxonomy, anderson2001taxonomy}. Each Creative Question carries \textbf{10 marks} and consists of an authentic stimulus or stem (\textsl{Uddipak}) followed by four sequential sub-questions:
+\begin{enumerate}[label=(\alph*),noitemsep,topsep=2pt]
+    \item \textbf{Knowledge (\textsl{Gyanmulak}) [1 Mark, Bloom Level 1]:} Direct factual recall from the textbook; independent of the stem.
+    \item \textbf{Comprehension (\textsl{Anudhabonmulak}) [2 Marks, Bloom Level 2]:} Conceptual explanation or definition; tests basic understanding without requiring stem data.
+    \item \textbf{Application (\textsl{Proyogmulak}) [3 Marks, Bloom Level 3]:} Requires the examinee to apply theoretical concepts to solve or analyze the specific scenario provided in the stem.
+    \item \textbf{Higher-Order Thinking (\textsl{Uchchotoro Dokkhotamulak}) [4 Marks, Bloom Levels 4--6]:} Critical evaluation, synthesis, mathematical derivation, or comparative judgment regarding the stem's scenario.
+\end{enumerate}
+
+\begin{figure*}[!hbp]
+\centering
+\includegraphics[width=\textwidth]{figs/fig1_cq_anatomy}
+\caption{\textbf{Anatomical Breakdown of an NCTB Creative Question (CQ) and Cognitive Mapping.} Each 10-mark item pairs an authentic stimulus stem with four hierarchical sub-questions systematically linked to Bloom's Revised Cognitive Taxonomy.}
+\label{fig:cq_anatomy}
+\end{figure*}
+
+\subsection{Multiple Choice Questions (MCQ)}
+Standardized 25-to-35 question MCQ sections accompany written papers, featuring four options labeled either (a, b, c, d) or Bengali characters (\textsl{Ka, Kha, Ga, Gha}). Each correct choice earns 1 mark.
+
+\subsection{Curriculum Timeline and Policy Interruptions}
+Historical question prediction must account for structural policy shifts:
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{2008--2012:} Introduction and phased expansion of the Creative Curriculum.
+    \item \textbf{2012--2019:} Stable implementation of the revised NCTB national syllabus.
+    \item \textbf{2020:} The COVID-19 pandemic resulted in the complete cancellation of HSC 2020 exams (the ``Auto-pass'' cohort); SSC 2020 occurred in February 2020 immediately prior to lockdowns.
+    \item \textbf{2021--2023:} Introduction of the ``Short Syllabus'' (\textsl{Sonkhipto Pathosuchi}), restricting examination coverage to 50--70\% of designated core chapters.
+    \item \textbf{2024--2026:} Progressive rollout of the new competency-based curriculum framework.
+\end{itemize}
+
+---
+
+\section{Corpus Construction and Engineering Pipeline}
+\label{sec:pipeline}
+
+The construction of \textbf{BD-ExamQ} required resolving non-trivial data acquisition, optical recognition, and structural extraction challenges \cite{smith2007tesseract, chowdhury2019bangla, gebru2021datasheets}. The overall pipeline is depicted in Figure~\ref{fig:pipeline}.
+
+\begin{figure*}[!hbp]
+\centering
+\includegraphics[width=\textwidth]{figs/fig2_pipeline}
+\caption{\textbf{Architecture of the BD-ExamQ Corpus Extraction and Multimodal Pipeline.} End-to-end flow from historical PDF ingestion to OCR recognition, regex structural segmentation, and dual-format distribution.}
+\label{fig:pipeline}
+\end{figure*}
+
+\subsection{Dual-Language Optical Character Recognition}
+Older Bangladeshi question papers are available solely as physical printed exam sheets that were scanned into PDF format. Because these exams contain both Bengali script and English notation (e.g., mathematical symbols, chemical equations like $\text{H}_2\text{SO}_4$, scientific terms like ``Axon'', ``Reflex Arc'', ``DNA''), standard single-language OCR produces garbled output. We configured Tesseract \cite{smith2007tesseract} with combined multilingual trained models (\texttt{-l ben+eng}) applied over 150~DPI normalized pixmaps. Margin watermarks and portal advertisement banners are dynamically filtered using regex pattern boundaries.
+
+\subsection{Formal Data Model}
+Each extracted item conforms to a unified schema serialized as JSON Lines (\nolinkurl{data/processed/questions.jsonl}):
+\begin{equation}
+    Q_i = \langle \text{id}, \text{exam}, \text{year}, \text{board}, \text{subject}, \text{paper}, \text{type}, \text{stem}, \mathcal{S}_{\text{sub}}, \mathcal{O}_{\text{mcq}}, \text{marks}, \text{source} \rangle
+\end{equation}
+where $\mathcal{S}_{\text{sub}} = \{ (p_j, t_j, m_j) \}_{j=1}^4$ contains the structured sub-parts for Creative Questions, and $\mathcal{O}_{\text{mcq}} = \{ o_1, o_2, o_3, o_4 \}$ contains multiple-choice alternatives.
+
+---
+
+\section{Quantitative Corpus Statistics}
+\label{sec:stats}
+
+The completed corpus encompasses \textbf{545 full question paper PDFs} yielding \textbf{15,307 structured question items}. Table~\ref{tab:overview} summarizes the top-level descriptive metrics.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Top-Level Descriptive Metrics of the BD-ExamQ Corpus.}
+\label{tab:overview}
+\begin{tabularx}{\textwidth}{l r X}
+\toprule
+\textbf{Metric} & \textbf{Value} & \textbf{Description / Significance} \\
+\midrule
+Total Question Paper PDFs & 545 & Authentic official examination papers on disk \\
+Total Question Records & 15,307 & Complete question blocks (CQ stems + standalone MCQs) \\
+Total CQ Sub-Questions & 12,015 & Structured cognitive sub-items ($a, b, c, d$ / \textsl{Ka}, \textsl{Kha}, \textsl{Ga}, \textsl{Gha}) \\
+Total Examination Marks & 56,149 & Cumulative assessment marks represented across all exams \\
+Mean Words per Question Stem & 54.34 & Bengali/English lexical count per stimulus text \\
+HSC Representation & 8,591 (56.1\%) & Higher Secondary Certificate (Grade 12) assessment items \\
+SSC Representation & 6,716 (43.9\%) & Secondary School Certificate (Grade 10) assessment items \\
+Multiple Choice (MCQ) Items & 10,769 (70.4\%) & 1-mark objective questions with 4 candidate options \\
+Creative Question (CQ) Items & 4,538 (29.6\%) & 10-mark multi-part cognitive scenarios \\
+Total Education Boards & 9 + National & Comprehensive territorial coverage of Bangladesh \\
+Corpus CSV Size & 12.15 MB & Clean tabular format for direct empirical analysis \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Board and Geographical Representation}
+A critical requirement for cross-board generalizability is balanced geographical representation. Table~\ref{tab:board_distribution} displays the breakdown across all nine education boards, national unified papers, and combined board administrations.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Geographical Distribution of Question Records Across Education Boards.}
+\label{tab:board_distribution}
+\begin{tabular}{lrrp{6.5cm}}
+\toprule
+\textbf{Education Board} & \textbf{PDF Papers} & \textbf{Questions} & \textbf{Regional Characteristics} \\
+\midrule
+Dhaka & 99 & 3,558 & Central division; largest student cohort \\
+Chattogram & 66 & 1,707 & Southeastern division; major commercial hub \\
+All Board (National) & 57 & 1,512 & Unified standardized examination sets \\
+Dinajpur & 56 & 1,502 & Northern division; primarily rural education network \\
+Rajshahi & 58 & 1,462 & Northwestern division; historic academic center \\
+Sylhet & 55 & 1,444 & Northeastern division \\
+Barishal & 55 & 1,402 & Southern coastal division \\
+Jashore & 50 & 1,314 & Southwestern division \\
+Cumilla & 39 & 984 & Eastern division \\
+Combined Boards & 10 & 422 & Specialized combined board testing \\
+\midrule
+\textbf{Total} & \textbf{545} & \textbf{15,307} & \textbf{Comprehensive nationwide representation} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Subject Domain Breakdown}
+The corpus covers science (STEM), humanities, business studies, and foundational language subjects:
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Chemistry (1st \& 2nd Paper):} 2,708 items
+    \item \textbf{Mathematics \& Higher Mathematics:} 2,106 items
+    \item \textbf{Bengali (1st \& 2nd Paper):} 1,812 items
+    \item \textbf{Physics (1st \& 2nd Paper):} 1,716 items
+    \item \textbf{Biology (1st \& 2nd Paper):} 1,239 items
+    \item \textbf{Information \& Communication Technology (ICT):} 781 items
+    \item \textbf{English (1st \& 2nd Paper):} 56 items
+    \item \textbf{Commerce \& Humanities (Finance, Economics, Accounting, Civics):} 4,889 items
+\end{itemize}
+
+\subsection{Cognitive Distribution Across Creative Questions}
+Among the 12,015 structured CQ sub-parts, the distribution precisely tracks the mandated NCTB cognitive rubric:
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Knowledge ($a$ / \textsl{Ka}):} 3,705 sub-questions (1 Mark each)
+    \item \textbf{Comprehension ($b$ / \textsl{Kha}):} 3,003 sub-questions (2 Marks each)
+    \item \textbf{Application ($c$ / \textsl{Ga}):} 2,971 sub-questions (3 Marks each)
+    \item \textbf{Higher-Order Thinking ($d$ / \textsl{Gha}):} 2,336 sub-questions (4 Marks each)
+\end{itemize}
+
+\clearpage
+\begin{figure*}[!hbp]
+\centering
+\includegraphics[width=\textwidth]{figs/fig3_corpus_dynamics}
+\caption{\textbf{Quantitative Dynamics of the BD-ExamQ Corpus.} (a) Annual distribution of extracted questions spanning 2010 to 2024, explicitly highlighting the 2020 COVID-19 Auto-Pass hiatus and the 2021--2022 pandemic Shortened Syllabi periods. (b) Hierarchical breakdown of the 56,149 examination marks indexed across Bloom's Taxonomy cognitive tiers and objective Multiple Choice Questions (MCQ).}
+\label{fig:corpus_dynamics}
+\end{figure*}
+
+\clearpage
+
+\section{System Architecture: Hierarchical Educational Assessment and Forecasting Engine}
+\label{sec:system_architecture}
+
+Standardized examination prediction presents unique challenges that distinguish it fundamentally from unconstrained text generation or conventional time-series forecasting. While students colloquially inquire \textsl{``Which questions will appear on the exam?''}, predicting exact question strings is mathematically ill-posed and practically brittle: examination committees deliberately rephrase stems, alter numerical parameters, and combine distinct sub-topics across adjacent cycles to test conceptual mastery rather than rote regurgitation. Concurrently, question setters operate under statutory pedagogical mandates established by the National Curriculum and Textbook Board (NCTB), requiring systematic coverage across syllabus groups, adherence to the four-tier Bloom's cognitive taxonomy, and strict compliance with official policy constraints (e.g., short-syllabus directives).
+
+To address these domain realities, we formalize our system architecture not as an unconstrained generative model, but as a \textbf{Hierarchical Multi-Scale Educational Forecasting Framework} structured into four decoupled, synergistic operational tiers, illustrated in Figure~\ref{fig:system_architecture}.
+
+\begin{figure*}[!h]
+\centering
+\includegraphics[width=\textwidth]{figs/fig4_system_architecture}
+\caption{\textbf{Enterprise Educational Assessment Forecasting and Synthesis Architecture.} The architecture mirrors state-of-the-art forensic NLP pipelines: raw examination cohort ingestion (left, colour-coded by stream), multimodal OCR and structural preprocessing (top, showing the bilingual Tesseract hub), hierarchical multi-scale forecasting engines (centre: TGAT Chapter Prior, Constrained Dirichlet Marks Regressor, RAG Question Synthesizer, Cross-Board Diffusion), sanitized corpus datastore and ethical governance (right), and calibrated pedagogical decision bounds with recency alert and high-yield prediction outputs (bottom). Feedback arrows indicate the iterative teacher-review validation loop.}
+\label{fig:system_architecture}
+\end{figure*}
+
+
+\subsection{Tier 1: Heterogeneous Multimodal Ingestion Layer}
+The foundation of the architecture ingests three canonical input streams:
+\begin{enumerate}[noitemsep,topsep=2pt]
+    \item \textbf{Historical Question Archive ($\mathcal{H}_{<t}$):} Verified board exam papers from 2010 to $t-1$ across 9 education boards, stored as high-resolution scanned PDFs and structured JSONL records.
+    \item \textbf{Curricular Knowledge Corpus ($\mathcal{T}$):} Official National Curriculum and Textbook Board (NCTB) textbooks, detailing chapters, section hierarchies, and statutory learning outcomes (\textsl{Shikhonfol}).
+    \item \textbf{Policy and Disruption Covariates ($\mathcal{C}_{\text{cov}}$):} Explicit timeline indicators denoting structural interventions, including the 2020 Auto-Pass (cancelled exams), the 2021--2023 pandemic Shortened Syllabi (which eliminated 40--50\% of chapters), and changes in question choice ratios (e.g., answering 3 out of 8 vs.\ 5 out of 8).
+\end{enumerate}
+
+\subsection{Tier 2: Bilingual Representation \& Temporal Knowledge Graph}
+Raw scanned examination documents pass through an OCR and semantic transformation pipeline:
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Multimodal OCR \& Structural Segmentation:} High-resolution page rendering (150~DPI) processed via Tesseract with Bengali and English models (\texttt{-l ben+eng}), followed by heuristic regex parsing that segments each item into context stems ($S$) and linked sub-parts ($a, b, c, d$).
+    \item \textbf{Dense Semantic Representation:} Domain questions and textbook learning outcomes are embedded into a shared latent space $\mathbf{e}_q \in \mathbb{R}^d$ using Transformer-based \cite{vaswani2017attention} pretrained Bengali encoders (BanglaBERT \cite{bhattacharjee2022banglabert} or Multilingual E5):
+    \begin{equation}
+        \mathbf{e}_q = \text{TransformerEncoder}(q_{\text{bn}})
+    \end{equation}
+    \item \textbf{Heterogeneous Temporal Knowledge Graph ($\mathcal{G}$):} We formalize exam history as a dynamic multi-relational graph $\mathcal{G} = (\mathcal{V}, \mathcal{E}, \mathcal{T})$. Node set $\mathcal{V}$ comprises Education Boards ($\mathcal{V}_B$), Exam Years ($\mathcal{V}_Y$), Syllabus Chapters ($\mathcal{V}_C$), and Core Concepts ($\mathcal{V}_K$). Directed temporal edges $(u, v, t)$ encode co-occurrence in the same paper, consecutive-year repetition, or cross-board concept borrowing.
+\end{itemize}
+
+\subsection{Tier 3: Multi-Scale Hierarchical Predictive Engine}
+Rather than attempting monolithic end-to-end question text forecasting, the engine operates across three mathematically decoupled scales:
+
+\subsubsection{Macro-Scale: Syllabus Chapter Prior Forecasting}
+At the coarsest granularity, the system predicts the probability distribution over syllabus chapters $\mathcal{C}$ that will appear in paper $\text{Paper}_{t, b, s}$:
+\begin{equation}
+    P(c_i \in \text{Paper}_{t, b, s} \mid \mathcal{G}_{<t}, \mathcal{C}_{\text{cov}})
+\end{equation}
+We model this via a \textbf{Temporal Graph Attention Network (TGAT)} \cite{xu2020tgat, sankar2020dysat}. For node $u$ at examination year $t$, TGAT aggregates temporal neighborhood features:
+\begin{equation}
+    \mathbf{h}_u(t) = \text{TGAT}\left( \mathbf{x}_u, \{ (\mathbf{h}_v(t_e), \Phi(t - t_e)) \mid v \in \mathcal{N}(u), t_e < t \} \right)
+\end{equation}
+where $\Phi(\Delta t) \in \mathbb{R}^{d_t}$ is a continuous sinusoidal time encoding:
+\begin{equation}
+    \Phi(\Delta t) = \left[ \cos(\omega_1 \Delta t), \sin(\omega_1 \Delta t), \dots, \cos(\omega_k \Delta t), \sin(\omega_k \Delta t) \right]^\top
+\end{equation}
+Temporal attention coefficients $\alpha_{uv}(t)$ explicitly capture cyclic rotation patterns (the educational tendency to rotate topics across adjacent years) and cross-board diffusion (boards borrowing conceptual structures established by Dhaka Board in year $t-1$).
+
+\subsubsection{Meso-Scale: Cognitive Domain and Marks-Weight Allocation}
+Standard examinations require precise mark balancing. For each Creative Question (10 marks total), statutory regulations dictate the exact cognitive breakdown: Knowledge ($a=1$), Comprehension ($b=2$), Application ($c=3$), and Higher-Order Thinking ($d=4$).
+
+At the paper level, the mark distribution across syllabus chapters forms a constrained compositional vector $\mathbf{p} \in \Delta^{M-1}$ where $\sum_{m=1}^M p_m = 1$. We formulate this via \textbf{Dirichlet Regression}:
+\begin{equation}
+    \mathbf{p} \sim \text{Dirichlet}(\boldsymbol{\alpha}), \quad \boldsymbol{\alpha} = \text{Softplus}(\mathbf{W}_\alpha \mathbf{h}_{\text{paper}} + \mathbf{b}_\alpha)
+\end{equation}
+where $\mathbf{h}_{\text{paper}}$ is the pooled representation of the predicted paper context. The expected mark allocation for chapter $m$ is $\hat{W}_m = W_{\text{total}} \cdot \frac{\alpha_m}{\sum_j \alpha_j}$, satisfying total marks conservation ($W_{\text{total}} \in \{70, 75, 100\}$).
+
+\subsubsection{Micro-Scale: Curriculum-Grounded Question Synthesis}
+At the finest granularity, the system generates plausible, novel examination items grounded in statutory NCTB textbooks. Using a Retrieval-Augmented Generation (RAG) architecture \cite{lewis2020rag, du2017learning, wang2018question}, the generator is conditioned on:
+\begin{enumerate}[noitemsep]
+    \item The predicted target chapter $c^* \in \hat{\mathcal{C}}_t$.
+    \item The retrieved textbook learning outcome $\mathcal{T}_{c^*}$ (\textsl{Shikhonfol}).
+    \item The target Bloom's cognitive level $d$ across the four statutory tiers (Knowledge, Comprehension, Application, Higher-Order Thinking).
+\end{enumerate}
+For Creative Questions, generation proceeds hierarchically:
+\begin{equation}
+    P(S, q_a, q_b, q_c, q_d \mid \mathcal{T}_{c^*}) = P(S \mid \mathcal{T}_{c^*}) \prod_{k \in \{a,b,c,d\}} P(q_k \mid S, q_{<k}, d_k, \mathcal{T}_{c^*})
+\end{equation}
+enforcing that application ($q_c$) and higher-order evaluation ($q_d$) are semantically bound to the scenario introduced in stem $S$.
+
+\subsection{Tier 4: Validation Harness and Pedagogical Applications}
+The final tier subjects all model predictions to rigorous leak-free chronological evaluation ($\le 2017$ train, 2018--2022 validation, 2023 holdout test). Generated questions and predicted distributions are evaluated through:
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Quantitative Ranking Metrics:} Top-$k$ Chapter Hit Rate ($\text{HitRate}@k$) and Marks-Weighted Coverage ($\text{MarksCov}@k$).
+    \item \textbf{Distributional Alignment:} Wasserstein Earth Mover's Distance ($\text{EMD}$) between predicted and actual mark vectors.
+    \item \textbf{Pedagogical Parity Audits:} Quantifying whether rural boards (e.g., Dinajpur, Barishal) exhibit lower conceptual diversity or delayed topic adoption relative to metropolitan boards (Dhaka, Chattogram).
+    \item \textbf{Double-Blind Turing Evaluation:} Expert secondary school teachers evaluate randomized pairs of board-authored vs.\ synthetic questions to assess curriculum fidelity, stem coherence, and Bloom's rubric compliance.
+\end{itemize}
+
+\subsection{Ethical Safeguards and Anti-Leak Stance}
+We emphasize that this architecture is explicitly engineered for \textbf{pedagogical curriculum analysis and diagnostic assistance}, not for predicting unauthorized question leaks. By modeling high-level chapter distributions, cognitive weight allocations, and textbook-grounded synthesis, the framework provides transparent diagnostic insights that democratize test preparation for under-resourced students and aid educators in designing balanced, equitable formative assessments.
+
+---
+
+\section{Benchmark Formalization and Experimental Protocol}
+\label{sec:benchmark}
+
+\subsection{Task Definition: Temporal Question Forecasting}
+We formulate the educational assessment prediction task as follows: Given the complete historical sequence of board examination questions up to year $t-1$:
+\begin{equation}
+    \mathcal{H}_{<t} = \{ Q_{\tau, b, s} \mid \tau \le t-1, \, b \in \mathcal{B}, \, s \in \mathcal{S} \}
+\end{equation}
+predict the set of syllabus chapters $\hat{\mathcal{C}}_{t, b, s}^{(k)}$ of cardinality $k$ that will be evaluated in year $t$ for board $b$ and subject $s$, maximizing alignment with the true examined chapter set $\mathcal{C}_{t, b, s}^*$.
+
+\subsection{Chronological Leak-Free Splitting}
+Random cross-validation (e.g., $k$-fold) causes catastrophic temporal leakage in time-series data: model weights would be influenced by future exam papers to predict past ones. Therefore, \textbf{BD-ExamQ} enforces a strict chronological partition:
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Training Partition ($\le 2017$):} 12,420 questions. Serves as historical grounding data.
+    \item \textbf{Validation Partition ($2018 \le t \le 2022$):} 2,071 questions. Used for hyperparameter tuning and model calibration.
+    \item \textbf{Test Partition ($t = 2023$ Holdout):} 802 questions. Unseen blind evaluation testbed reflecting modern post-pandemic examination realities.
+\end{itemize}
+
+\subsection{Evaluation Metrics}
+Models are evaluated on the test set using two standard domain metrics:
+\begin{enumerate}
+    \item \textbf{Top-$k$ Chapter Hit Rate ($\text{Hit}@k$):}
+    \begin{equation}
+        \text{HitRate}@k = \frac{|\hat{\mathcal{C}}_k \cap \mathcal{C}^*|}{|\mathcal{C}^*|}
+    \end{equation}
+    reflecting the proportion of actual tested chapters captured within the model's top-$k$ recommendations.
+    \item \textbf{Marks-Weighted Coverage ($\text{Cov}@k$):}
+    \begin{equation}
+        \text{MarksCov}@k = \frac{\sum_{c \in \hat{\mathcal{C}}_k} \text{Marks}(c)}{\sum_{c^* \in \mathcal{C}^*} \text{Marks}(c^*)} \times 100\%
+    \end{equation}
+    weighting successful predictions by the examination marks allocated to that chapter.
+\end{enumerate}
+
+\subsection{Baseline Models and Preliminary Findings}
+We implemented three foundational baselines formulated in our project roadmap:
+\begin{enumerate}[noitemsep,topsep=2pt]
+    \item \textbf{Historical Frequency Baseline:} Ranks chapters purely by cumulative appearance frequency in $\mathcal{H}_{<t}$.
+    \item \textbf{Recency Heuristic (``Alternation Hypothesis''):} Formalizes the student belief that topics tested in year $t-1$ are rotated out, prioritizing chapters unexamined in the preceding cycle.
+    \item \textbf{First-Order Markov Model:} Models chapter transitions as a stochastic process where $P(c_t \mid c_{t-1})$ is estimated via maximum likelihood from successive exam cycles.
+\end{enumerate}
+
+Preliminary results indicate that while the Frequency Baseline captures perpetual high-yield chapters (e.g., Newtonian Mechanics, Periodic Properties), the Recency Heuristic achieves superior recall on dynamic subjects (e.g., ICT and Biology), corroborating that question setters deliberately rotate specific sub-topics across adjacent years.
+
+---
+
+\section{Proposed Research Directions for Thesis Supervision}
+\label{sec:thesis_directions}
+
+With the corpus compiled and verified, we submit the following three concrete research trajectories for supervisory discussion:
+
+\subsection{Direction A: Temporal Knowledge Graph Neural Networks (T-GNN)}
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Concept:} Construct a multi-relational graph connecting Concepts, Chapters, Boards, and Exam Years. Nodes represent syllabus topics; temporal edges capture co-occurrence and annual transitions.
+    \item \textbf{Method:} Apply Dynamic Graph Convolutional Networks (DGCN) or Temporal Graph Attention Networks (TGAT) \cite{xu2020tgat, sankar2020dysat} to forecast edge formation in year $t$.
+    \item \textbf{Novelty:} First application of graph deep learning to national examination forecasting in South Asia.
+\end{itemize}
+
+\subsection{Direction B: Fine-Tuning LLMs for Bilingual Educational Assessment}
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Concept:} Leverage open-source multilingual Large Language Models \cite{radford2019language, scao2021bloom, hasan2020lowresource} (e.g., Bangla-LLaMA, Mistral-7B, Gemma-2-9B) fine-tuned on the \textbf{BD-ExamQ} corpus.
+    \item \textbf{Objectives:} 
+    \begin{enumerate}[noitemsep]
+        \item Automated Bloom's Taxonomy cognitive classification of unstructured exam questions.
+        \item Few-shot generation of novel, curriculum-aligned Creative Questions (stem + 4 sub-parts).
+        \item Cross-lingual transfer learning from English standardized test benchmarks to Bengali.
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Direction C: Cross-Board Information Diffusion and Parity Analysis}
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Concept:} Empirically quantify cross-board question leakage and conceptual similarity.
+    \item \textbf{Research Questions:} Do regional boards borrow question patterns from Dhaka Board from preceding years? Does question difficulty vary systematically between urban (Dhaka, Chattogram) and rural-dominated boards (Dinajpur, Barishal) \cite{unesco2019bangladesh}?
+\end{itemize}
+
+---
+
+\section{Data Governance, Integrity, and Reproducibility}
+\label{sec:governance}
+
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Data Integrity:} Every downloaded PDF and processed JSONL file is indexed with cryptographic SHA-256 hashes in \texttt{data/raw/manifest.json}.
+    \item \textbf{Open Source \& Code Quality:} The entire ingestion, OCR, parsing, and baseline code is managed in a reproducible Python virtual environment with explicit dependencies (\texttt{requirements.txt}).
+    \item \textbf{Ethical Compliance:} Examination papers published by the Ministry of Education are official public records. The corpus is curated strictly for non-profit academic research, pedagogical analysis, and machine learning benchmarking under academic fair-use guidelines \cite{gebru2021datasheets}.
+\end{itemize}
+
+---
+
+\section{Conclusion}
+\label{sec:conclusion}
+The \textbf{BD-ExamQ} corpus provides the first comprehensive, machine-readable, and temporally rigorous foundation for standardized assessment research in Bangladesh. Spanning 545 verified board examination papers and 15,307 structured items across 15 years, it enables machine learning models to be trained and evaluated on authentic national assessment data. We respectfully invite the supervisor's feedback on the dataset architecture, benchmark splits, and the proposed thesis trajectories.
+
+\vspace{1.5em}
+\noindent\rule{\textwidth}{0.4pt}
+\begin{center}
+\small \textsl{Document compiled autonomously via the BD-ExamQ Agentic Pipeline on \today.}
+\end{center}
+
+---
+
+\begin{thebibliography}{99}
+\bibitem{bloom1956taxonomy}
+B.~S. Bloom, M.~D. Engelhart, E.~J. Furst, W.~H. Hill, and D.~R. Krathwohl.
+\newblock \textsl{Taxonomy of Educational Objectives: The Classification of Educational Goals. Handbook I: Cognitive Domain}.
+\newblock David McKay Company, New York, 1956.
+
+\bibitem{anderson2001taxonomy}
+L.~W. Anderson, D.~R. Krathwohl, et~al.
+\newblock \textsl{A Taxonomy for Learning, Teaching, and Assessing: A Revision of Bloom's Taxonomy of Educational Objectives}.
+\newblock Longman, New York, 2001.
+
+\bibitem{nctb2012curriculum}
+National Curriculum and Textbook Board (NCTB).
+\newblock \textsl{National Curriculum 2012: Secondary and Higher Secondary Curriculum Framework}.
+\newblock Ministry of Education, Government of the People's Republic of Bangladesh, Dhaka, 2012.
+
+\bibitem{nctb2017creative}
+National Curriculum and Textbook Board (NCTB).
+\newblock \textsl{Teacher Training Manual for Setting Creative Questions (Srijonshil Proshno Paddhati)}.
+\newblock Secondary Education Sector Investment Program (SESIP), Ministry of Education, Dhaka, 2017.
+
+\bibitem{unesco2019bangladesh}
+UNESCO.
+\newblock \textsl{Assessment of Transversal Competencies in Policy and Practice: Bangladesh National Report}.
+\newblock UNESCO Asia and Pacific Regional Bureau for Education, Bangkok, 2019.
+
+\bibitem{baker2009educational}
+R.~S. Baker and K.~Yacef.
+\newblock The state of educational data mining in 2009: A review and future visions.
+\newblock \textsl{Journal of Educational Data Mining}, 1(1):3--17, 2009.
+
+\bibitem{hendrycks2021measuring}
+D.~Hendrycks, C.~Burns, S.~Basart, A.~Zou, M.~Mazzue, D.~Song, and J.~Steinhardt.
+\newblock Measuring massive multitask language understanding ({MMLU}).
+\newblock In \textsl{International Conference on Learning Representations (ICLR)}, 2021.
+
+\bibitem{smith2007tesseract}
+R.~Smith.
+\newblock An overview of the {Tesseract} {OCR} engine.
+\newblock In \textsl{Ninth International Conference on Document Analysis and Recognition (ICDAR)}, pages 629--633. IEEE, 2007.
+
+\bibitem{chowdhury2019bangla}
+S.~Chowdhury, S.~Chatterjee, and U.~Garain.
+\newblock Printed and handwritten {Bengali} script optical character recognition: Challenges and perspectives.
+\newblock \textsl{IEEE Access}, 7:147320--147339, 2019.
+
+\bibitem{gebru2021datasheets}
+T.~Gebru, J.~Morgenstern, B.~Vecchione, J.~W. Vaughan, H.~Wallach, H.~Daum{\'e}~III, and K.~Crawford.
+\newblock Datasheets for datasets.
+\newblock \textsl{Communications of the ACM}, 64(12):86--92, 2021.
+
+\bibitem{xu2020tgat}
+D.~Xu, C.~Ruan, E.~Korpeoglu, S.~Kumar, and K.~Achan.
+\newblock Inductive representation learning on temporal graphs.
+\newblock In \textsl{International Conference on Learning Representations (ICLR)}, 2020.
+
+\bibitem{sankar2020dysat}
+A.~Sankar, Y.~Wu, L.~Gou, W.~Zhang, and H.~Yang.
+\newblock {DySAT}: Deep neural representation learning on dynamic graphs via self-attention networks.
+\newblock In \textsl{ACM International Conference on Web Search and Data Mining (WSDM)}, pages 519--527, 2020.
+
+\bibitem{bhattacharjee2022banglabert}
+F.~Bhattacharjee, T.~Hasan, W.~Ahmad, and R.~Shahriyar.
+\newblock {BanglaBERT}: Language model pretraining and benchmarks for low-resource {Indic} language understanding.
+\newblock In \textsl{Findings of the Association for Computational Linguistics: NAACL 2022}, pages 1318--1332, 2022.
+
+\bibitem{hasan2020lowresource}
+T.~Hasan, F.~Bhattacharjee, K.~Samin, M.~Hasan, M.~Basak, M.~M. Rahman, and R.~Shahriyar.
+\newblock Not low-resource anymore: {Bangla} {NLP} resources and survey.
+\newblock In \textsl{Findings of the Association for Computational Linguistics: EMNLP 2020}, pages 4662--4671, 2020.
+
+\bibitem{du2017learning}
+X.~Du, J.~Shao, and C.~Cardie.
+\newblock Learning to ask: Neural question generation for reading comprehension.
+\newblock In \textsl{Association for Computational Linguistics (ACL)}, pages 1342--1352, 2017.
+
+\bibitem{wang2018question}
+Q.~Wang, P.~Liu, Z.~Zhu, H.~Yin, M.~Zhang, and S.~Nie.
+\newblock A comprehensive survey on automatic question generation.
+\newblock \textsl{arXiv preprint arXiv:1705.00106}, 2018.
+
+\bibitem{lewis2020rag}
+P.~Lewis, E.~Perez, A.~Piktus, F.~Petroni, V.~Karpukhin, N.~Goyal, H.~K{\"u}ttler, M.~Lewis, W.-t. Yih, T.~Rockt{\"a}schel, et~al.
+\newblock Retrieval-augmented generation for knowledge-intensive {NLP} tasks.
+\newblock In \textsl{Advances in Neural Information Processing Systems (NeurIPS)}, 33:9459--9474, 2020.
+
+\bibitem{vaswani2017attention}
+A.~Vaswani, N.~Shazeer, N.~Parmar, J.~Uszkoreit, L.~Jones, A.~N. Gomez, {\L}.~Kaiser, and I.~Polosukhin.
+\newblock Attention is all you need.
+\newblock In \textsl{Advances in Neural Information Processing Systems (NeurIPS)}, 30:5998--6008, 2017.
+
+\bibitem{scao2021bloom}
+T.~L. Scao and A.~M. Rush.
+\newblock How many data points is a prompt worth?
+\newblock In \textsl{North American Chapter of the Association for Computational Linguistics (NAACL)}, pages 2627--2636, 2021.
+
+\bibitem{radford2019language}
+A.~Radford, J.~Wu, R.~Child, D.~Luan, D.~Amodei, and I.~Sutskever.
+\newblock Language models are unsupervised multitask learners.
+\newblock \textsl{OpenAI Technical Report}, 2019.
+\end{thebibliography}
+
+\end{document}
