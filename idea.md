@@ -47,5 +47,3 @@ Creative questions (CQ) should be stored as a stem plus four linked sub-question
 2. **Scale-up:** all boards and subjects, with the annotation protocol and inter-annotator agreement (Cohen's kappa) on a double-labelled subset.
 3. **Analysis and baselines:** descriptive statistics, then the prediction experiments.
 4. **Release:** datasheet for the dataset, the schema, and the scripts.
-
-Next, I can write the annotation guidelines and chapter taxonomy template, draft the schema as a ready-to-use spreadsheet or JSON, or outline the paper's literature review and related work. Which would you like first?
